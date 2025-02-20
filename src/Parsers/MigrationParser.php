@@ -8,10 +8,33 @@ class MigrationParser
 {
     public function parse(string $file): void
     {
-        // what do I need to parse?
-        // table name?
-        // data type
-        // column name
-        // foreign keys?
+
+    }
+
+    public function tableName(string $content): ?string
+    {
+        if (preg_match('/Schema::create\(\'(\w+)\'/', $content, $matches)) {
+            return $matches[1];
+        }
+
+        return null;
+    }
+
+    public function columnType(string $content): ?array
+    {
+        if (preg_match_all('/\$table->(\w+)\(\'(\w+)\'/', $content, $matches)) {
+            return $matches[1];
+        }
+
+        return null;
+    }
+
+    public function columnName(string $content): ?array
+    {
+        if (preg_match_all('/\$table->(\w+)\(\'(\w+)\'/', $content, $matches)) {
+            return $matches[2];
+        }
+
+        return null;
     }
 }
