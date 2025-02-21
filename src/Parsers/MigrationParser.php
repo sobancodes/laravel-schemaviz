@@ -37,4 +37,18 @@ class MigrationParser
 
         return null;
     }
+
+    public function foreignKeys(string $content): ?array
+    {
+        if (preg_match_all(
+            '/\$table->foreignId\(\'(\w+)\'/',
+            $content,
+            $matches,
+        )
+        ) {
+            return $matches[1];
+        }
+
+        return null;
+    }
 }

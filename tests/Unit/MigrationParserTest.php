@@ -41,3 +41,13 @@ it('can extract data type', function () {
         ),
     )->toBeArray();
 });
+
+it('can extract foreign keys', function () {
+    expect(
+        app(MigrationParser::class)->foreignKeys(
+            getMigrationContent('create_posts_table'),
+        ),
+    )->toBeArray()->toHaveCount(1);
+});
+
+todo('can extract foreign keys with unsignedBigInteger datatype');
