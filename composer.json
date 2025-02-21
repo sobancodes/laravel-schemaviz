@@ -5,7 +5,10 @@
     "autoload": {
         "psr-4": {
             "Soban\\LaravelErBlueprint\\": "src/"
-        }
+        },
+        "files": [
+            "src/Helpers/migration_helpers.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
