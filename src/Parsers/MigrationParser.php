@@ -4,11 +4,25 @@ declare(strict_types=1);
 
 namespace Soban\LaravelErBlueprint\Parsers;
 
+use Illuminate\Support\Facades\File;
+
 class MigrationParser
 {
-    public function parse(string $file): void
+    public function parse(\SplFileInfo $file): ?array
     {
+        if (!($content = File::get($file->getRealPath()))) {
+            return null;
+        }
 
+        $tableName = $this->tableName($content);
+        $columnTypes = $this->columnType($content);
+        $columnName = $this->columnName($content);
+
+        return [
+            'table_name'   => $tableName,
+            'column_types' => $columnTypes,
+            'column_name'  => $columnName,
+        ];
     }
 
     public function tableName(string $content): ?string

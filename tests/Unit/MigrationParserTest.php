@@ -51,3 +51,11 @@ it('can extract foreign keys', function () {
 });
 
 todo('can extract foreign keys with unsignedBigInteger datatype');
+
+it('can parse a migration file', function () {
+    expect(
+        app(MigrationParser::class)->parse(
+            fetchMigrations('create_posts_table'),
+        ),
+    )->toBeArray()->toHaveCount(3);
+});
