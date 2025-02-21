@@ -2,10 +2,8 @@
 
 declare(strict_types=1);
 
-namespace Soban\LaravelErBlueprint\Tests\Feature;
 
 use Soban\LaravelErBlueprint\Parsers\MigrationParser;
-use SplFileInfo;
 
 it('can fetch migration files', function () {
     expect(fetchMigrations())
