@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Soban\LaravelErBlueprint\Extractors;
 
-use Soban\LaravelPlayground\Contracts\MigrationExtractorInterface;
+use Soban\LaravelErBlueprint\Contracts\MigrationExtractorInterface;
 
 class MigrationExtractor implements MigrationExtractorInterface
 {

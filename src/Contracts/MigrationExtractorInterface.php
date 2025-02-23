@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Soban\LaravelPlayground\Contracts;
+namespace Soban\LaravelErBlueprint\Contracts;
 
 interface MigrationExtractorInterface
 {
