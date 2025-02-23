@@ -24,7 +24,8 @@ class MermaidRenderer
             $diagram .= $this->indentBySpace().$parsedMigration['table_name']
                 ." {\n";
             foreach ($parsedMigration['column_types'] as $key => $column) {
-                $diagram .= $this->indentBySpace(2).$column
+                $diagram .= $this->indentBySpace(2).
+                    getSqlEquivalentType($column)
                     ." {$parsedMigration['column_name'][$key]}\n";
             }
             $diagram .= $this->indentBySpace()."}\n";

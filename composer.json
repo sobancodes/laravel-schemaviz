@@ -15,6 +15,13 @@
             "Soban\\LaravelErBlueprint\\Tests\\": "tests/"
         }
     },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Soban\\LaravelErBlueprint\\Providers\\ErBlueprintServiceProvider"
+            ]
+        }
+    },
     "authors": [
         {
             "name": "Soban Farooq",

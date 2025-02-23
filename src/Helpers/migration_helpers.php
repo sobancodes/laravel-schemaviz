@@ -43,3 +43,13 @@ if (!function_exists('getMigrationContent')) {
         return File::get(fetchMigrations($fileName)->getRealPath());
     }
 }
+
+if (!function_exists('getSqlEquivalentType')) {
+    function getSqlEquivalentType(string $laravelType): string
+    {
+        $type = config('columns.map');
+        return isset($type[$laravelType])
+            ? $type[$laravelType]
+            : $laravelType;
+    }
+}
