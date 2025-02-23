@@ -8,46 +8,83 @@ use Soban\LaravelErBlueprint\Contracts\MigrationExtractorInterface;
 
 class MigrationExtractor implements MigrationExtractorInterface
 {
-    private array $patterns
+    private const patterns
         = [
-            'table'     => '/Schema::create\(\'(\w+)\'/',
-            'column'    => '/\$table->(\w+)\(\'(\w+)\'/',
-            'foreignId' => '/\$table->foreignId\(\'(\w+)\'/',
+            'table'  => '/Schema::create\(\'(\w+)\'/',
+            'column' => '/\$table->(\w+)\(\'(\w+)\'(?:,\s*(\d+))?\)(.*?);/',
         ];
 
-    public function tableName(string $content): ?string
+    private array $cached = [];
+
+    public function extractAll(string $content): array
     {
-        if (preg_match($this->patterns['table'], $content, $matches)) {
+        return [];
+    }
+
+    private function matchPatterns(
+        string $content,
+        string $forPattern,
+        bool $matchSingle = true,
+    ): string|array {
+        if ($matchSingle) {
+            return $this->matchSingle($content, $forPattern);
+        }
+
+        return $this->matchAll($content, $forPattern);
+    }
+
+    private function matchSingle(
+        string $content,
+        string $forPattern,
+    ): string {
+        if (preg_match(self::patterns[$forPattern], $content, $matches)) {
             return $matches[1];
         }
 
-        return null;
+        return "unknown_{$forPattern}";
     }
 
-    public function columnType(string $content): ?array
+    private function matchAll($content, string $forPattern): array
     {
-        if (preg_match_all($this->patterns['column'], $content, $matches)) {
-            return $matches[1];
+        \preg_match_all(
+            self::patterns[$forPattern],
+            $content,
+            $matches,
+            PREG_SET_ORDER,
+        );
+
+        return $matches;
+    }
+
+    private function getCached(
+        string $content,
+        string $forPattern,
+        bool $matchSingle = true,
+    ): string|array {
+        if (isset($this->cached[$forPattern])) {
+            return $this->cached[$forPattern];
         }
 
-        return null;
+        return $this->cached[$forPattern] = $this->matchPatterns(
+            $content,
+            $forPattern,
+            $matchSingle,
+        );
     }
 
-    public function columnName(string $content): ?array
+    public function tableName(string $content): string
     {
-        if (preg_match_all($this->patterns['column'], $content, $matches)) {
-            return $matches[2];
-        }
-
-        return null;
+        return $this->getCached($content, 'table');
     }
 
-    public function foreignKeys(string $content): ?array
+    public function columnType(string $content): array
     {
-        if (preg_match_all($this->patterns['foreignId'], $content, $matches)) {
-            return $matches[1];
-        }
-
-        return null;
+        return $this->getCached($content, 'column', false);
     }
+
+    public function columnName(string $content): array
+    {
+        return $this->getCached($content, 'column', false);
+    }
+
 }
