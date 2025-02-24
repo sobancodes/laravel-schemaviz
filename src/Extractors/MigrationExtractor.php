@@ -42,21 +42,21 @@ class MigrationExtractor
 
     private function tableName(string $content): string
     {
-        return $this->getCached($content, 'table');
+        return $this->getRawExtract($content, 'table');
     }
 
     private function columnType(string $content): array
     {
-        return $this->getMigrationDataByIndex(
-            $this->getCached($content, 'column', false),
+        return $this->getDataFromExtract(
+            $this->getRawExtract($content, 'column', false),
             1,
         );
     }
 
     private function columnName(string $content): array
     {
-        return $this->getMigrationDataByIndex(
-            $this->getCached($content, 'column', false),
+        return $this->getDataFromExtract(
+            $this->getRawExtract($content, 'column', false),
             2,
         );
     }
@@ -64,8 +64,8 @@ class MigrationExtractor
     private function isNullable(string $content): array
     {
         return $this->getModifiers(
-            $this->getMigrationDataByIndex(
-                $this->getCached($content, 'column', false),
+            $this->getDataFromExtract(
+                $this->getRawExtract($content, 'column', false),
                 4,
             ),
             'nullable',
@@ -76,8 +76,8 @@ class MigrationExtractor
     private function isIndex(string $content): array
     {
         return $this->getModifiers(
-            $this->getMigrationDataByIndex(
-                $this->getCached($content, 'column', false),
+            $this->getDataFromExtract(
+                $this->getRawExtract($content, 'column', false),
                 4,
             ),
             'index',
@@ -88,8 +88,8 @@ class MigrationExtractor
     private function isUnique(string $content): array
     {
         return $this->getModifiers(
-            $this->getMigrationDataByIndex(
-                $this->getCached($content, 'column', false),
+            $this->getDataFromExtract(
+                $this->getRawExtract($content, 'column', false),
                 4,
             ),
             'unique',
@@ -100,8 +100,8 @@ class MigrationExtractor
     private function columnDefault(string $content): array
     {
         return $this->getModifiers(
-            $this->getMigrationDataByIndex(
-                $this->getCached($content, 'column', false),
+            $this->getDataFromExtract(
+                $this->getRawExtract($content, 'column', false),
                 4,
             ),
             'default',
@@ -113,8 +113,8 @@ class MigrationExtractor
     private function columnComment(string $content): array
     {
         return $this->getModifiers(
-            $this->getMigrationDataByIndex(
-                $this->getCached($content, 'column', false),
+            $this->getDataFromExtract(
+                $this->getRawExtract($content, 'column', false),
                 4,
             ),
             'comment',

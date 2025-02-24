@@ -18,10 +18,6 @@ class MigrationParser implements ParserInterface
 
         $extractor = new MigrationExtractor();
 
-        return [
-            'table_name'   => $extractor->tableName($content),
-            'column_types' => $extractor->columnType($content),
-            'column_name'  => $extractor->columnName($content),
-        ];
+        return [];
     }
 }

@@ -6,7 +6,7 @@ trait CacheExtractedMigration
 {
     public const cached = [];
 
-    public function getCached(
+    public function getRawExtract(
         string $content,
         string $forPattern,
         bool $matchSingle = true,

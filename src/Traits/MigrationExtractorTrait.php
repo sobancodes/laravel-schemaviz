@@ -40,7 +40,7 @@ trait MigrationExtractorTrait
         return $matches;
     }
 
-    private function getMigrationDataByIndex(
+    protected function getDataFromExtract(
         array $migrationMetaData,
         int $at,
     ): array {
