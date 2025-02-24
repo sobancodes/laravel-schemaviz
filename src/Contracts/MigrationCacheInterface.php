@@ -6,7 +6,7 @@ interface MigrationCacheInterface
 {
     public const cached = [];
 
-    public function getCachedOrRunRawExtractor(
+    public function getResolvedPatternOrBuild(
         string $content,
         string $forPattern,
         bool $matchSingle = true,

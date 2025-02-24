@@ -4,20 +4,13 @@ declare(strict_types=1);
 
 namespace Soban\LaravelErBlueprint\Extractors;
 
-use Soban\LaravelErBlueprint\Contracts\MigrationCacheInterface;
-use Soban\LaravelErBlueprint\Contracts\MigrationExtractorInterface;
-use Soban\LaravelErBlueprint\Models\Column;
-use Soban\LaravelErBlueprint\Models\Table;
-use Soban\LaravelErBlueprint\Traits\CacheExtractedMigration;
-use Soban\LaravelErBlueprint\Traits\MigrationExtractorTrait;
+use Soban\LaravelErBlueprint\Traits\PatternMatcher;
 
-use function in_array;
+use function array_map;
 
-class MigrationExtractor
-    implements MigrationExtractorInterface, MigrationCacheInterface
+class MigrationExtractor extends AbstractMigrationExtractor
 {
-    use MigrationExtractorTrait;
-    use CacheExtractedMigration;
+    use PatternMatcher;
 
     protected const patterns
         = [
@@ -30,159 +23,165 @@ class MigrationExtractor
             'comment'  => '/->comment\(\'?(.*?)\'?\)/',
         ];
 
-    public function getTable(string $content): Table
-    {
-        return new Table(
-            $this->tableName($content),
-            $this->getAllColumns($content),
-        );
-    }
-
-    public function getAllColumns(string $content): array
-    {
-        $columns = [];
-
-        $rawColumns = $this->getCachedOrRunRawExtractor(
-            $content,
-            'column',
-            false,
-        );
-
-        foreach ($rawColumns as $column) {
-            $columns[] = $this->getColumn($column);
-        }
-
-        return $columns;
-    }
-
-    public function getColumn(array $column): Column
-    {
-        return new Column(
-            $this->columnName($column),
-            $this->columnType($column),
-            $this->isNullable($column),
-            $this->isIndex($column),
-            $this->isUnique($column),
-            null,
-            $this->columnDefault($column),
-            $this->columnComment($column),
-        );
-    }
-
-    public function getColumnByName(
+    protected function extractAttributes(
         string $content,
-        string $columnName,
-    ): ?Column
-    {
-        $rawColumns = $this->getCachedOrRunRawExtractor(
-            $content,
-            'column',
-            false,
-        );
-
-        foreach ($rawColumns as $column) {
-            if (!in_array($columnName, $column)) {
-                return $this->getColumn($column);
-            }
-        }
-
-        return null;
+        string $forPattern,
+        bool $matchSingle = true,
+    ): array|string|null {
+        return $this->matchPatterns($content, $forPattern, $matchSingle);
     }
 
-    private function tableName(string $content): string
+    protected function tableName(string $content): string
     {
-        return $this->getCachedOrRunRawExtractor($content, 'table');
+        return $this->getResolvedPatternOrBuild($content, 'table');
     }
 
-    private function columnType(
+    protected function columnType(
         array $arg,
-        bool $receivesColumn = true,
+        bool $retrieveSingleColumn = true,
     ): string|array
     {
-        if ($receivesColumn) {
+        if ($retrieveSingleColumn) {
             return $arg[1];
         }
 
-        return $this->extractFromRawByIndex($arg, 1);
+        return $this->getSubAttributes($arg, 1);
     }
 
-    private function columnName(
+    protected function columnName(
         array $arg,
-        bool $receivesColumn = true,
+        bool $retrieveSingleColumn = true,
     ): string|array
     {
-        if ($receivesColumn) {
+        if ($retrieveSingleColumn) {
             return $arg[2];
         }
 
-        return $this->extractFromRawByIndex($arg, 2);
+        return $this->getSubAttributes($arg, 2);
     }
 
     public function isNullable(
         array $arg,
-        bool $receivesColumn = true,
+        bool $retrieveSingleColumn = true,
     ): null|bool|string|array
     {
         return $this->getModifiers(
             $arg,
             'nullable',
             0,
-            $receivesColumn,
+            $retrieveSingleColumn,
         );
     }
 
-    private function isIndex(
+    protected function isIndex(
         array $arg,
-        bool $receivesColumn = true,
+        bool $retrieveSingleColumn = true,
     ): null|bool|string|array
     {
         return $this->getModifiers(
             $arg,
             'index',
             0,
-            $receivesColumn,
+            $retrieveSingleColumn,
         );
     }
 
-    private function isUnique(
+    protected function isUnique(
         array $arg,
-        bool $receivesColumn = true,
+        bool $retrieveSingleColumn = true,
     ): null|bool|string|array
     {
         return $this->getModifiers(
             $arg,
             'unique',
             0,
-            $receivesColumn,
+            $retrieveSingleColumn,
         );
     }
 
-    private function columnDefault(
+    protected function columnDefault(
         array $arg,
-        bool $receivesColumn = true,
+        bool $retrieveSingleColumn = true,
     ): null|bool|string|array
     {
         return $this->getModifiers(
             $arg,
             'default',
             1,
-            $receivesColumn,
+            $retrieveSingleColumn,
             false,
         );
     }
 
-    private function columnComment(
+    protected function columnComment(
         array $arg,
-        bool $receivesColumn = true,
+        bool $retrieveSingleColumn = true,
     ): null|bool|string|array
     {
         return $this->getModifiers(
             $arg,
             'comment',
             1,
-            $receivesColumn,
+            $retrieveSingleColumn,
             false,
         );
     }
 
+    private function getModifiers(
+        array $arg,
+        string $forPattern,
+        int $matchAt,
+        bool $retrieveSingleColumn,
+        bool $boolOrValue = true,
+    ): null|bool|string|array {
+        if ($retrieveSingleColumn) {
+            return $this->getModifier(
+                $arg[4],
+                $forPattern,
+                $matchAt,
+                $boolOrValue,
+            );
+        }
+
+        return array_map(
+            function (string $modifier) use (
+                $forPattern,
+                $matchAt,
+                $boolOrValue,
+            ) {
+                $this->getModifier(
+                    $modifier,
+                    $forPattern,
+                    $matchAt,
+                    $boolOrValue,
+                );
+            },
+            $this->getSubAttributes($arg, 4),
+        );
+    }
+
+    private function getModifier(
+        string $modifier,
+        string $forPattern,
+        int $matchAt,
+        bool $boolOrValue,
+    ): null|bool|string {
+        $match = $this->matchSingle(
+            $modifier,
+            $forPattern,
+            $matchAt,
+        );
+
+        return $boolOrValue ? (bool)$match : $match;
+    }
+
+    private function getSubAttributes(
+        array $migrationMetaData,
+        int $at,
+    ): array {
+        return \array_map(
+            fn(array $column) => $column[$at],
+            $migrationMetaData,
+        );
+    }
 }
