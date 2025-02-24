@@ -7,8 +7,8 @@ use Soban\LaravelErBlueprint\Extractors\MigrationExtractor;
 todo('migration parser');
 
 it('example test', function () {
-    $output = app(MigrationExtractor::class)->extractAll(
+    $output = app(MigrationExtractor::class)->comment(
         getMigrationContent('create_users_table'),
     );
-    // dd($output);
+    dd($output);
 });

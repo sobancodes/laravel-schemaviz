@@ -4,87 +4,123 @@ declare(strict_types=1);
 
 namespace Soban\LaravelErBlueprint\Extractors;
 
+use Soban\LaravelErBBlueprint\Traits\CacheExtractedMigration;
+use Soban\LaravelErBBlueprint\Traits\MigrationExtractorTrait;
+use Soban\LaravelErBlueprint\Contracts\MigrationCacheInterface;
 use Soban\LaravelErBlueprint\Contracts\MigrationExtractorInterface;
 
-class MigrationExtractor implements MigrationExtractorInterface
+class MigrationExtractor
+    implements MigrationExtractorInterface, MigrationCacheInterface
 {
+    use MigrationExtractorTrait;
+    use CacheExtractedMigration;
+
     private const patterns
         = [
-            'table'  => '/Schema::create\(\'(\w+)\'/',
-            'column' => '/\$table->(\w+)\(\'(\w+)\'(?:,\s*(\d+))?\)(.*?);/',
+            'table'    => '/Schema::create\(\'(\w+)\'/',
+            'column'   => '/\$table->(\w+)\(\'(\w+)\'(?:,\s*([^\)]+))?\)(.*?);/',
+            'nullable' => '/->nullable\(\)/',
+            'index'    => '/->index\(\)/',
+            'unique'   => '/->unique\(\)/',
+            'default'  => '/->default\(\'?(.*?)\'?\)/',
+            'comment'  => '/->comment\(\'?(.*?)\'?\)/',
         ];
 
-    private array $cached = [];
+    public function getTable(string $content) {}
 
-    public function extractAll(string $content): array
+    public function getAllColumns(string $content): array
     {
         return [];
     }
 
-    private function matchPatterns(
+    public function getColumnByName(
         string $content,
-        string $forPattern,
-        bool $matchSingle = true,
-    ): string|array {
-        if ($matchSingle) {
-            return $this->matchSingle($content, $forPattern);
-        }
-
-        return $this->matchAll($content, $forPattern);
-    }
-
-    private function matchSingle(
-        string $content,
-        string $forPattern,
+        string $columnName,
     ): string {
-        if (preg_match(self::patterns[$forPattern], $content, $matches)) {
-            return $matches[1];
-        }
-
-        return "unknown_{$forPattern}";
+        return '';
     }
 
-    private function matchAll($content, string $forPattern): array
-    {
-        \preg_match_all(
-            self::patterns[$forPattern],
-            $content,
-            $matches,
-            PREG_SET_ORDER,
-        );
-
-        return $matches;
-    }
-
-    private function getCached(
-        string $content,
-        string $forPattern,
-        bool $matchSingle = true,
-    ): string|array {
-        if (isset($this->cached[$forPattern])) {
-            return $this->cached[$forPattern];
-        }
-
-        return $this->cached[$forPattern] = $this->matchPatterns(
-            $content,
-            $forPattern,
-            $matchSingle,
-        );
-    }
-
-    public function tableName(string $content): string
+    private function tableName(string $content): string
     {
         return $this->getCached($content, 'table');
     }
 
-    public function columnType(string $content): array
+    private function columnType(string $content): array
     {
-        return $this->getCached($content, 'column', false);
+        return $this->getMigrationDataByIndex(
+            $this->getCached($content, 'column', false),
+            1,
+        );
     }
 
-    public function columnName(string $content): array
+    private function columnName(string $content): array
     {
-        return $this->getCached($content, 'column', false);
+        return $this->getMigrationDataByIndex(
+            $this->getCached($content, 'column', false),
+            2,
+        );
+    }
+
+    private function isNullable(string $content): array
+    {
+        return $this->getModifiers(
+            $this->getMigrationDataByIndex(
+                $this->getCached($content, 'column', false),
+                4,
+            ),
+            'nullable',
+            0,
+        );
+    }
+
+    private function isIndex(string $content): array
+    {
+        return $this->getModifiers(
+            $this->getMigrationDataByIndex(
+                $this->getCached($content, 'column', false),
+                4,
+            ),
+            'index',
+            0,
+        );
+    }
+
+    private function isUnique(string $content): array
+    {
+        return $this->getModifiers(
+            $this->getMigrationDataByIndex(
+                $this->getCached($content, 'column', false),
+                4,
+            ),
+            'unique',
+            0,
+        );
+    }
+
+    private function columnDefault(string $content): array
+    {
+        return $this->getModifiers(
+            $this->getMigrationDataByIndex(
+                $this->getCached($content, 'column', false),
+                4,
+            ),
+            'default',
+            1,
+            false,
+        );
+    }
+
+    private function columnComment(string $content): array
+    {
+        return $this->getModifiers(
+            $this->getMigrationDataByIndex(
+                $this->getCached($content, 'column', false),
+                4,
+            ),
+            'comment',
+            1,
+            false,
+        );
     }
 
 }

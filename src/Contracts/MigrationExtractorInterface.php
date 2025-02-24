@@ -6,11 +6,12 @@ namespace Soban\LaravelErBlueprint\Contracts;
 
 interface MigrationExtractorInterface
 {
-    public function extractAll(string $content): array;
+    public function getTable(string $content);
 
-    public function tableName(string $content): ?string;
+    public function getAllColumns(string $content): array;
 
-    public function columnType(string $content): ?array;
-
-    public function columnName(string $content): ?array;
+    public function getColumnByName(
+        string $content,
+        string $columnName,
+    ): string;
 }
