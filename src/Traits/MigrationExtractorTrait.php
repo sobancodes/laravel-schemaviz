@@ -1,6 +1,6 @@
 <?php
 
-namespace Soban\LaravelErBBlueprint\Traits;
+namespace Soban\LaravelErBlueprint\Traits;
 
 trait MigrationExtractorTrait
 {
@@ -40,7 +40,7 @@ trait MigrationExtractorTrait
         return $matches;
     }
 
-    protected function getDataFromExtract(
+    protected function extractFromRawByIndex(
         array $migrationMetaData,
         int $at,
     ): array {
@@ -51,22 +51,50 @@ trait MigrationExtractorTrait
     }
 
     private function getModifiers(
-        array $modifiers,
+        array $arg,
         string $forPattern,
         int $matchAt,
-        bool $bool = true,
-    ): array {
+        bool $singleColumn,
+        bool $getTruthyOrValue = true,
+    ): null|bool|string|array {
+        if ($singleColumn) {
+            return $this->getModifier(
+                $arg[4],
+                $forPattern,
+                $matchAt,
+                $getTruthyOrValue,
+            );
+        }
+
         return \array_map(
-            function (string $modifier) use ($forPattern, $matchAt, $bool) {
-                $match = $this->matchSingle(
+            function (string $modifier) use (
+                $forPattern,
+                $matchAt,
+                $getTruthyOrValue,
+            ) {
+                $this->getModifier(
                     $modifier,
                     $forPattern,
                     $matchAt,
+                    $getTruthyOrValue,
                 );
-
-                return $bool ? (bool)$match : $match;
             },
-            $modifiers,
+            $this->extractFromRawByIndex($arg, 4),
         );
+    }
+
+    private function getModifier(
+        string $modifier,
+        string $forPattern,
+        int $matchAt,
+        bool $getTruthyOrValue,
+    ): null|bool|string {
+        $match = $this->matchSingle(
+            $modifier,
+            $forPattern,
+            $matchAt,
+        );
+
+        return $getTruthyOrValue ? (bool)$match : $match;
     }
 }

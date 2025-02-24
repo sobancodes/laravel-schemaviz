@@ -1,12 +1,12 @@
 <?php
 
-namespace Soban\LaravelErBBlueprint\Traits;
+namespace Soban\LaravelErBlueprint\Traits;
 
 trait CacheExtractedMigration
 {
     public const cached = [];
 
-    public function getRawExtract(
+    public function getCachedOrRunRawExtractor(
         string $content,
         string $forPattern,
         bool $matchSingle = true,
@@ -15,7 +15,7 @@ trait CacheExtractedMigration
             return self::cached[$forPattern];
         }
 
-        return self::cached[$forPattern] = $this->matchPatterns(
+        return $this->matchPatterns(
             $content,
             $forPattern,
             $matchSingle,

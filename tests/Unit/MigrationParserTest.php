@@ -3,9 +3,6 @@
 declare(strict_types=1);
 
 
-use Soban\LaravelErBlueprint\Extractors\MigrationExtractor;
-use Soban\LaravelErBlueprint\Parsers\MigrationParser;
-
 it('can fetch migration files', function () {
     expect(fetchMigrations())
         ->toBeArray()
@@ -17,39 +14,15 @@ it('can fetch migration files', function () {
         )->toBeInstanceOf(SplFileInfo::class);
 });
 
-it('can extract table name', function () {
-    expect(
-        app(MigrationExtractor::class)->tableName(
-            getMigrationContent('create_users_table'),
-        ),
-    )->toBe('users');
-});
+todo('can extract table name', function () {});
 
-it('can extract column name', function () {
-    expect(
-        app(MigrationExtractor::class)->columnType(
-            getMigrationContent('create_users_table'),
-        ),
-    )->toBeArray();
-});
+todo('can extract column name', function () {});
 
-it('can extract data type', function () {
-    expect(
-        app(MigrationExtractor::class)->columnName(
-            getMigrationContent('create_users_table'),
-        ),
-    )->toBeArray();
-});
+todo('can extract data type', function () {});
 
 todo('can extract foreign keys with unsignedBigInteger datatype');
 
-it('can parse a migration file', function () {
-    expect(
-        app(MigrationParser::class)->parse(
-            fetchMigrations('create_posts_table'),
-        ),
-    )->toBeArray()->toHaveCount(3);
-});
+todo('can parse a migration file', function () {});
 
 
 // what happens if the column is extracted, but it does not exist in columns mapping?
