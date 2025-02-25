@@ -6,7 +6,7 @@ trait SingletonPatternFinder
 {
     protected array $resolvedPattern = [];
 
-    protected function getResolvedPatternOrBuild(
+    public function getResolvedPatternOrBuild(
         string $content,
         string $forPattern,
         bool $matchSingle = true,

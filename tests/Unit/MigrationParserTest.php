@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 
+use Soban\LaravelErBlueprint\Models\Column;
+
 it('can fetch migration files', function () {
     expect(fetchMigrations())
         ->toBeArray()
@@ -35,7 +37,7 @@ todo('can parse a migration file', function () {});
 it(
     'should return the method name if it is not found in column mapping',
     function () {
-        expect(getSqlEquivalentType('columnTypeThatDoesNotExist'))
+        expect(Column::getSqlEquivalentType('columnTypeThatDoesNotExist'))
             ->toBe('columnTypeThatDoesNotExist');
     },
 );
@@ -49,7 +51,9 @@ it(
             'float'      => 'FLOAT',
         ];
 
-        expect(getSqlEquivalentType($key))->toBe($sqlEquivalentColumns[$key]);
+        expect(Column::getSqlEquivalentType($key))->toBe(
+            $sqlEquivalentColumns[$key],
+        );
     },
 )->with([
     [

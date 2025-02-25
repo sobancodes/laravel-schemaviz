@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Soban\LaravelErBlueprint\Renderers;
 
+use Soban\LaravelErBlueprint\Models\Column;
 use Soban\LaravelErBlueprint\Parsers\MigrationParser;
 
 class MermaidRenderer
@@ -25,7 +26,7 @@ class MermaidRenderer
                 ." {\n";
             foreach ($parsedMigration['column_types'] as $key => $column) {
                 $diagram .= $this->indentBySpace(2).
-                    getSqlEquivalentType($column)
+                    Column::getSqlEquivalentType($column)
                     ." {$parsedMigration['column_name'][$key]}\n";
             }
             $diagram .= $this->indentBySpace()."}\n";

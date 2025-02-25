@@ -14,4 +14,12 @@ class Column
         public ?string $default,
         public ?string $comment,
     ) {}
+
+    public static function getSqlEquivalentType(string $laravelType): string
+    {
+        $type = config('columns.map');
+        return isset($type[$laravelType])
+            ? $type[$laravelType]
+            : $laravelType;
+    }
 }
