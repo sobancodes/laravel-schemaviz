@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Soban\LaravelErBlueprint\Renderers;
 
-use Soban\LaravelErBlueprint\Models\Column;
 use Soban\LaravelErBlueprint\Parsers\MigrationParser;
 
 class MermaidRenderer
@@ -21,13 +20,12 @@ class MermaidRenderer
         $diagram = "erDiagram\n";
 
         foreach ($migrations as $migration) {
-            $parsedMigration = app(MigrationParser::class)->parse($migration);
-            $diagram .= $this->indentBySpace().$parsedMigration['table_name']
+            $table = app(MigrationParser::class)->parse($migration);
+            $diagram .= $this->indentBySpace().$table->name
                 ." {\n";
-            foreach ($parsedMigration['column_types'] as $key => $column) {
+            foreach ($table->getColumns() as $key => $column) {
                 $diagram .= $this->indentBySpace(2).
-                    Column::getSqlEquivalentType($column)
-                    ." {$parsedMigration['column_name'][$key]}\n";
+                    $column->__toString();
             }
             $diagram .= $this->indentBySpace()."}\n";
         }
