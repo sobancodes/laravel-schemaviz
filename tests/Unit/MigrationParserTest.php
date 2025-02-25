@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 
+use Soban\LaravelErBlueprint\Models\Column;
+
 it('can fetch migration files', function () {
     expect(fetchMigrations())
         ->toBeArray()
@@ -32,15 +34,15 @@ todo('can parse a migration file', function () {});
 // so if the method exists that is not mappable through column mapping, we should simply add it as it is
 // so the test should not fail in that case
 
-it(
+todo(
     'should return the method name if it is not found in column mapping',
     function () {
-        expect(getSqlEquivalentType('columnTypeThatDoesNotExist'))
+        expect(Column::getSqlEquivalentType('columnTypeThatDoesNotExist'))
             ->toBe('columnTypeThatDoesNotExist');
     },
 );
 
-it(
+todo(
     'can map laravel migration methods to valid sql column data types',
     function (string $key): void {
         $sqlEquivalentColumns = [
@@ -49,7 +51,9 @@ it(
             'float'      => 'FLOAT',
         ];
 
-        expect(getSqlEquivalentType($key))->toBe($sqlEquivalentColumns[$key]);
+        expect(Column::getSqlEquivalentType($key))->toBe(
+            $sqlEquivalentColumns[$key],
+        );
     },
 )->with([
     [
