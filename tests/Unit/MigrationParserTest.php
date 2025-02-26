@@ -3,7 +3,9 @@
 declare(strict_types=1);
 
 
+use Soban\LaravelErBlueprint\Extractors\MigrationExtractor;
 use Soban\LaravelErBlueprint\Models\Column;
+use Soban\LaravelErBlueprint\Models\Table;
 
 it('can fetch migration files', function () {
     expect(fetchMigrations())
@@ -16,7 +18,32 @@ it('can fetch migration files', function () {
         )->toBeInstanceOf(SplFileInfo::class);
 });
 
-todo('can extract table name', function () {});
+it('can build instance of table class from a migration', function () {
+    $migration = migration();
+    expect(
+        app(MigrationExtractor::class)
+            ->getTable($migration),
+    )->toBeInstanceOf(Table::class);
+});
+
+it('can extract table name', function () {
+    $migration = migration();
+    $table = app(MigrationExtractor::class)
+        ->getTable($migration);
+    expect($table->name)->toBe('users');
+});
+
+it('can build column instances', function () {
+    $table = app(MigrationExtractor::class)
+        ->getTable(migration());
+    expect($table->columns)->not
+        ->toBeEmpty()
+        ->and($table->columns)->toBeArray();
+
+    foreach ($table->columns as $column) {
+        expect($column)->toBeInstanceOf(Column::class);
+    }
+});
 
 todo('can extract column name', function () {});
 
