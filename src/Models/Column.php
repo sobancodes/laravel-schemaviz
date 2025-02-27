@@ -58,8 +58,8 @@ readonly class Column
     public function getSqlEquivalentType(): string
     {
         $type = config('columns.map');
-        return isset($type[$this->getType()])
-            ? $type[$this->getType()]
+        return isset($type[str()->snake($this->getType())])
+            ? $type[str()->snake($this->getType())]
             : $this->getType();
     }
 

@@ -33,23 +33,41 @@ it('can extract table name', function () {
     expect($table->name)->toBe('users');
 });
 
-it('can build column instances', function () {
-    $table = app(MigrationExtractor::class)
-        ->getTable(migration());
-    expect($table->columns)->not
-        ->toBeEmpty()
-        ->and($table->columns)->toBeArray();
+it('can extract all columns from a migration', function () {
+    $columns = app(MigrationExtractor::class)
+        ->getMigrationColumns(migration());
 
-    foreach ($table->columns as $column) {
+    expect($columns)->not
+        ->toBeEmpty()
+        ->and($columns)->toBeArray();
+
+    foreach ($columns as $column) {
         expect($column)->toBeInstanceOf(Column::class);
     }
 });
 
-todo('can extract column name', function () {});
+it('can extract column name', function () {
+    $column = app(MigrationExtractor::class)
+        ->getMigrationColumns(column());
 
-todo('can extract data type', function () {});
+    expect($column)
+        ->toBeArray()
+        ->and($column)->toHaveCount(1)
+        ->and($column[0])->toBeInstanceOf(Column::class);
+});
 
-todo('can extract foreign keys with unsignedBigInteger datatype');
+it('can extract laravel column type from a migration column', function () {
+    expect(extractColumn())
+        ->toBeInstanceOf(Column::class)
+        ->and(extractColumn())->getType()->toBe('string');
+});
+
+it('can extract sql column type from a migration column', function () {
+    expect(extractColumn())
+        ->getSqlEquivalentType()->toBe('VARCHAR')
+        ->and(extractColumn('foreignId'))
+        ->getSqlEquivalentType()->toBe('UNSIGNED BIGINT');
+});
 
 todo('can parse a migration file', function () {});
 

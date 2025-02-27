@@ -35,6 +35,8 @@
 |
 */
 
+use Soban\LaravelErBlueprint\Extractors\MigrationExtractor;
+use Soban\LaravelErBlueprint\Models\Column;
 use Soban\LaravelErBlueprint\Tests\TestCase;
 
 pest()->extend(TestCase::class)->in(__DIR__);
@@ -50,4 +52,17 @@ function migration(): string
             $table->decimal('balance')->default('0.00')->comment('Account balance');
         });
         MIGRATION;
+}
+
+function column(string $type = 'string'): string
+{
+    return "\$table->{$type}('name');";
+}
+
+function extractColumn(string $type = 'string'): Column
+{
+    $column = app(MigrationExtractor::class)
+        ->getMigrationColumns(column($type));
+
+    return $column[0];
 }

@@ -17,11 +17,11 @@ abstract class AbstractMigrationExtractor
     {
         return new Table(
             $this->tableName($content),
-            $this->getAllColumns($content),
+            $this->getMigrationColumns($content),
         );
     }
 
-    public function getAllColumns(string $content): array
+    public function getMigrationColumns(string $content): array
     {
         $columns = [];
 

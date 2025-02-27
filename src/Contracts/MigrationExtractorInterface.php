@@ -11,7 +11,7 @@ interface MigrationExtractorInterface
 {
     public function getTable(string $content): Table;
 
-    public function getAllColumns(string $content): array;
+    public function getMigrationColumns(string $content): array;
 
     public function getColumnByName(
         string $content,
