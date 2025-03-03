@@ -47,13 +47,13 @@ it('can extract all columns from a migration', function () {
 });
 
 it('can extract column name', function () {
-    $column = app(MigrationExtractor::class)
+    $columns = app(MigrationExtractor::class)
         ->getMigrationColumns(column());
 
-    expect($column)
+    expect($columns)
         ->toBeArray()
-        ->and($column)->toHaveCount(1)
-        ->and($column[0])->toBeInstanceOf(Column::class);
+        ->and($columns)->toHaveCount(1)
+        ->and($columns[0])->toBeInstanceOf(Column::class);
 });
 
 it('can extract laravel column type from a migration column', function () {
