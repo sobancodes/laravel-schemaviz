@@ -69,6 +69,12 @@ it('can extract sql column type from a migration column', function () {
         ->getSqlEquivalentType()->toBe('UNSIGNED BIGINT');
 });
 
+it('can extract enum type and params from a migration column', function () {
+    expect(extractColumn('enum'))
+        ->getType()->toBe('enum')
+        ->getParams()->toBe("[18, 20]");
+});
+
 todo('can parse a migration file', function () {});
 
 

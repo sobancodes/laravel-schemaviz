@@ -7,10 +7,10 @@ readonly class Column
     public function __construct(
         private string $name,
         private string $type,
+        private mixed $param,
         private bool $nullable,
         private bool $index,
         private bool $unique,
-        private ?string $length,
         private ?string $default,
         private ?string $comment,
     ) {}
@@ -23,6 +23,11 @@ readonly class Column
     public function getType(): string
     {
         return $this->type;
+    }
+
+    public function getParams(): mixed
+    {
+        return $this->param;
     }
 
     public function isNullable(): bool
@@ -38,11 +43,6 @@ readonly class Column
     public function isUnique(): bool
     {
         return $this->unique;
-    }
-
-    public function getLength(): ?string
-    {
-        return $this->length;
     }
 
     public function getDefault(): ?string
@@ -65,7 +65,8 @@ readonly class Column
 
     public function __toString(): string
     {
-        $formattedString = $this->getName()." {$this->getSqlEquivalentType()}";
+        $formattedString = $this->getName()." {$this->getSqlEquivalentType()}".
+        !empty($this->getParams()) ? " {$this->getParams()}" : '';
 
         $formattedString .= $this->isNullable() ? ' NULLABLE' : '';
 

@@ -56,7 +56,11 @@ function migration(): string
 
 function column(string $type = 'string'): string
 {
-    return "\$table->{$type}('name');";
+    if ($type === 'enum') {
+        return "\$table->enum('age', [18, 20])->nullable()->index()->unique()->default(18)->comment('Age of birth');";
+    }
+
+    return "\$table->{$type}('name', 255);";
 }
 
 function extractColumn(string $type = 'string'): Column

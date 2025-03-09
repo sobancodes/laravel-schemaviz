@@ -43,10 +43,10 @@ abstract class AbstractMigrationExtractor
         return new Column(
             $this->columnName($column),
             $this->columnType($column),
+            $this->columnParam($column),
             $this->isNullable($column),
             $this->isIndex($column),
             $this->isUnique($column),
-            null,
             $this->columnDefault($column),
             $this->columnComment($column),
         );
@@ -80,6 +80,11 @@ abstract class AbstractMigrationExtractor
     abstract protected function tableName(string $content): string;
 
     abstract protected function columnType(
+        array $arg,
+        bool $retrieveSingleColumn = true,
+    ): string|array;
+
+    abstract protected function columnParam(
         array $arg,
         bool $retrieveSingleColumn = true,
     ): string|array;
