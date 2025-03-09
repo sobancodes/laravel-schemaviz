@@ -35,6 +35,38 @@
 |
 */
 
+use Soban\LaravelErBlueprint\Extractors\MigrationExtractor;
+use Soban\LaravelErBlueprint\Models\Column;
 use Soban\LaravelErBlueprint\Tests\TestCase;
 
 pest()->extend(TestCase::class)->in(__DIR__);
+
+function migration(): string
+{
+    return <<<'MIGRATION'
+        Schema::create('users', function (Blueprint $table) {
+            $table->string('name');
+            $table->string('email')->unique();
+            $table->timestamp('email_verified_at')->nullable();
+            $table->string('password');
+            $table->decimal('balance')->default('0.00')->comment('Account balance');
+        });
+        MIGRATION;
+}
+
+function column(string $type = 'string'): string
+{
+    if ($type === 'enum') {
+        return "\$table->enum('age', [18, 20])->nullable()->index()->unique()->default(18)->comment('Age of birth');";
+    }
+
+    return "\$table->{$type}('name', 255);";
+}
+
+function extractColumn(string $type = 'string'): Column
+{
+    $column = app(MigrationExtractor::class)
+        ->getMigrationColumns(column($type));
+
+    return $column[0];
+}

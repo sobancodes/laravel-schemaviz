@@ -48,6 +48,18 @@ class MigrationExtractor extends AbstractMigrationExtractor
         return $this->getSubAttributes($arg, 1);
     }
 
+
+    protected function columnParam(
+        array $arg,
+        bool $retrieveSingleColumn = true,
+    ): string|array {
+        if ($retrieveSingleColumn) {
+            return $arg[3];
+        }
+
+        return $this->getSubAttributes($arg, 1);
+    }
+
     protected function columnName(
         array $arg,
         bool $retrieveSingleColumn = true,
@@ -184,4 +196,5 @@ class MigrationExtractor extends AbstractMigrationExtractor
             $migrationMetaData,
         );
     }
+
 }

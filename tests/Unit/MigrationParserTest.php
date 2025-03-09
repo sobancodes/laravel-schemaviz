@@ -3,7 +3,9 @@
 declare(strict_types=1);
 
 
+use Soban\LaravelErBlueprint\Extractors\MigrationExtractor;
 use Soban\LaravelErBlueprint\Models\Column;
+use Soban\LaravelErBlueprint\Models\Table;
 
 it('can fetch migration files', function () {
     expect(fetchMigrations())
@@ -16,13 +18,62 @@ it('can fetch migration files', function () {
         )->toBeInstanceOf(SplFileInfo::class);
 });
 
-todo('can extract table name', function () {});
+it('can build instance of table class from a migration', function () {
+    $migration = migration();
+    expect(
+        app(MigrationExtractor::class)
+            ->getTable($migration),
+    )->toBeInstanceOf(Table::class);
+});
 
-todo('can extract column name', function () {});
+it('can extract table name', function () {
+    $migration = migration();
+    $table = app(MigrationExtractor::class)
+        ->getTable($migration);
+    expect($table->name)->toBe('users');
+});
 
-todo('can extract data type', function () {});
+it('can extract all columns from a migration', function () {
+    $columns = app(MigrationExtractor::class)
+        ->getMigrationColumns(migration());
 
-todo('can extract foreign keys with unsignedBigInteger datatype');
+    expect($columns)->not
+        ->toBeEmpty()
+        ->and($columns)->toBeArray();
+
+    foreach ($columns as $column) {
+        expect($column)->toBeInstanceOf(Column::class);
+    }
+});
+
+it('can extract column name', function () {
+    $columns = app(MigrationExtractor::class)
+        ->getMigrationColumns(column());
+
+    expect($columns)
+        ->toBeArray()
+        ->and($columns)->toHaveCount(1)
+        ->and($columns[0])->toBeInstanceOf(Column::class);
+});
+
+it('can extract laravel column type from a migration column', function () {
+    expect(extractColumn())
+        ->toBeInstanceOf(Column::class)
+        ->and(extractColumn())->getType()->toBe('string');
+});
+
+it('can extract sql column type from a migration column', function () {
+    expect(extractColumn())
+        ->getSqlEquivalentType()->toBe('VARCHAR')
+        ->and(extractColumn('foreignId'))
+        ->getSqlEquivalentType()->toBe('UNSIGNED BIGINT');
+});
+
+it('can extract enum type and params from a migration column', function () {
+    expect(extractColumn('enum'))
+        ->getType()->toBe('enum')
+        ->getParams()->toBe("[18, 20]");
+});
 
 todo('can parse a migration file', function () {});
 
