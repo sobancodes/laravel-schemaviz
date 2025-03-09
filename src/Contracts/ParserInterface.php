@@ -4,5 +4,5 @@ namespace Soban\LaravelErBlueprint\Contracts;
 
 interface ParserInterface
 {
-    public function parse(\SplFileInfo $file);
+    public static function parse(string $filePath);
 }

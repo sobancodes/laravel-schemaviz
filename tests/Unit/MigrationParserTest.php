@@ -8,13 +8,13 @@ use Soban\LaravelErBlueprint\Models\Column;
 use Soban\LaravelErBlueprint\Models\Table;
 
 it('can fetch migration files', function () {
-    expect(fetchMigrations())
+    expect(getMigrationPaths())
         ->toBeArray()
         ->and(
-            fetchMigrations(['create_users_table', 'create_posts_table']),
+            getMigrationPaths(['create_users_table', 'create_posts_table']),
         )->toHaveCount(2)
         ->and(
-            fetchMigrations('create_users_table'),
+            getMigrationPaths('create_users_table'),
         )->toBeInstanceOf(SplFileInfo::class);
 });
 
@@ -75,7 +75,9 @@ it('can extract enum type and params from a migration column', function () {
         ->getParams()->toBe("[18, 20]");
 });
 
-todo('can parse a migration file', function () {});
+it('can parse a migration file', function () {
+    dd(glob(database_path('migrations')));
+});
 
 
 // what happens if the column is extracted, but it does not exist in columns mapping?

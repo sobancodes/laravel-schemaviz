@@ -11,9 +11,9 @@ use Soban\LaravelErBlueprint\Models\Table;
 
 class MigrationParser implements ParserInterface
 {
-    public function parse(\SplFileInfo $file): ?Table
+    public static function parse(string $filePath): ?Table
     {
-        if (!($content = File::get($file->getRealPath()))) {
+        if (!($content = File::get($filePath))) {
             return null;
         }
 

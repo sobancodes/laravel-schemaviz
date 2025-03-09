@@ -8,19 +8,12 @@ use Soban\LaravelErBlueprint\Parsers\MigrationParser;
 
 class MermaidRenderer
 {
-    public function build(
-        null|string|array $migrationContaining = null,
-    ): ?string {
-        $migrations = fetchMigrations($migrationContaining);
-
-        if (!$migrations) {
-            return null;
-        }
-
+    public function build(array $migrationPaths): ?string
+    {
         $diagram = "erDiagram\n";
 
-        foreach ($migrations as $migration) {
-            $table = app(MigrationParser::class)->parse($migration);
+        foreach ($migrationPaths as $migrationPath) {
+            $table = MigrationParser::parse($migrationPath);
             $diagram .= $this->indentBySpace().$table->name
                 ." {\n";
             foreach ($table->getColumns() as $key => $column) {

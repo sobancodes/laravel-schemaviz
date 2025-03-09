@@ -66,7 +66,7 @@ readonly class Column
     public function __toString(): string
     {
         $formattedString = $this->getName()." {$this->getSqlEquivalentType()}".
-        !empty($this->getParams()) ? " {$this->getParams()}" : '';
+            (!empty($this->getParams()) ? " {$this->getParams()}" : '');
 
         $formattedString .= $this->isNullable() ? ' NULLABLE' : '';
 
